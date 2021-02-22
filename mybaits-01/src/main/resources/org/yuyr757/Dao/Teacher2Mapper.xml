@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.yuyr757.Dao.Teacher2Mapper">
+
+    <!-- 连表查询 -->
+    <select id="getTeacherById" resultMap="teacher2Student">
+        select t.id, t.name, s.id as student_id, s.name as student_name
+        from teacher t left join student s on t.id = s.teacher_id
+        where t.id = #{id}
+    </select>
+
+    <resultMap id="teacher2Student" type="teacher2">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <!-- 这里要用ofType，即集合的元素类型 -->
+        <collection property="students" ofType="student2">
+            <result property="id" column="student_id"/>
+            <result property="name" column="student_name"/>
+            <result property="teacherId" column="id"/>
+        </collection>
+    </resultMap>
+
+    <!-- 子查询 -->
+    <select id="getTeacherById2" resultMap="teacher2Student2">
+        select t.id, t.name from teacher t where t.id = #{id}
+    </select>
+
+    <resultMap id="teacher2Student2" type="teacher2">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <collection property="students" column="id" javaType="ArrayList" ofType="student2" select="getStudent"/>
+    </resultMap>
+
+    <select id="getStudent" resultMap="student2Map">
+        select * from student where teacher_id = #{id}
+    </select>
+
+    <resultMap id="student2Map" type="student2">
+        <result property="teacherId" column="teacher_id"/>
+    </resultMap>
+
+</mapper>

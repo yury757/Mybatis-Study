@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace命名空间要和接口绑定，要写全限定接口名 -->
+<mapper namespace="org.yuyr757.Dao.UserMapper">
+    <cache
+        eviction="FIFO"
+        flushInterval="60000"
+        size="512"
+        readOnly="true"/>
+
+    <!-- 结果集映射，将从数据库中取出来的id，name，password字段和User类中的属性做一个映射关系 -->
+    <resultMap id="UserMap" type="user">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="password" property="pwd"/>
+    </resultMap>
+
+    <!-- id：对应接口的方法名 -->
+    <!-- resultType：结果集类型，要写全限定类名 -->
+    <!-- parameterType：参数类型 -->
+    <!-- 当接口方法只有一个参数时，#{}中有以下几种填法 -->
+    <!--    1、若传入参数类型是一个实体类或其他类，#{}可直接填入相应属性名 -->
+    <!--    2、若传入参数类型是Map接口类（可以用别名map代表Map），#{}可直接填入相应的键值 -->
+    <!--    3、若传入参数是String、int等其他类型，#{}填任意值数字或字母的组合都行，建议使用param1 -->
+    <!-- 当接口方法只有多个参数时，parameterType可不填，#{}按接口方法的参数顺序填入#{param1}、#{param2} -->
+    <select id="getUserList" resultType="user">
+        select * from user
+    </select>
+
+    <select id="getUserById" parameterType="int" resultMap="UserMap">
+        select id, name, pwd as password from user where id = #{param1}
+    </select>
+
+    <insert id="addUser" parameterType="org.yuyr757.pojo.User">
+        insert into user(id, name, pwd) values (#{id}, #{name}, #{pwd})
+    </insert>
+
+    <update id="updateUser" parameterType="org.yuyr757.pojo.User">
+        update user set name = #{name}, pwd = #{pwd} where id = #{id}
+    </update>
+
+    <delete id="deleteUser" parameterType="int">
+        delete from user where id = #{param1}
+    </delete>
+
+    <!-- ==================以下是多个参数的例子================== -->
+    <!-- 有两个类型相同的参数的查询 -->
+    <select id="getTwoUserById" parameterType="int" resultType="org.yuyr757.pojo.User">
+        select * from user where id = #{param1} or id = #{param2}
+    </select>
+
+    <!-- 有两个类型不同的参数的查询2 -->
+    <select id="getTwoUserById2" parameterType="Object" resultType="org.yuyr757.pojo.User">
+        select * from user where id = #{param1} or name = #{param2}
+    </select>
+
+    <!-- 有两个类型不同的参数的查询3 -->
+    <select id="getTwoUserById3" resultType="org.yuyr757.pojo.User">
+        select * from user where id = #{param1} or id = #{param2.id}
+    </select>
+
+    <!-- 有两个类型不同的参数的查询4 -->
+    <select id="getTwoUserById4" resultType="org.yuyr757.pojo.User">
+        select * from user where id = #{id} or id = #{user.id}
+    </select>
+    <!-- ==================以下使用Map的例子================== -->
+    <insert id="addUserUsingMap" parameterType="map">
+        insert into user(id, name, pwd) values (#{ID}, #{NAME}, #{PWD})
+    </insert>
+
+    <select id="getUserListUsingMap" resultType="map">
+        select * from user
+    </select>
+
+    <!-- ==================模糊查询有两种方式================== -->
+    <!-- 1、在mapper中这样用来拼接%：like "%"#{param1}"%" -->
+    <!-- 2、mapper中仍然使用like #{param1}，而在调用方式时手动在传入参数两边加上% -->
+    <select id="getUserLike1" parameterType="string" resultType="org.yuyr757.pojo.User">
+        select * from user where name like "%"#{param1}"%"
+    </select>
+
+    <select id="getUserLike2" parameterType="string" resultType="org.yuyr757.pojo.User">
+        select * from user where name like #{param1}
+    </select>
+
+    <!-- ==================模糊查询有两种方式================== -->
+    <select id="getUserLimit" parameterType="map" resultType="user">
+        select * from user limit #{startIndex}, #{endIndex}
+    </select>
+
+    <!-- ==================缓存================== -->
+    <select id="getUserByIdUsingCache" resultType="user">
+        select * from user where id = #{id}
+    </select>
+
+</mapper>

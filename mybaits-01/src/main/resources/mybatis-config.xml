@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- mybatis核心配置文件 -->
+<configuration>
+    <!--  引入外部配置文件  -->
+    <properties resource="db.properties"/>
+
+    <!-- 设置 -->
+    <settings>
+<!--        <setting name="logImpl" value="STDOUT_LOGGING"/>-->
+        <setting name="logImpl" value="LOG4J"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+<!--        <setting name="cacheEnabled" value="true"/>-->
+    </settings>
+
+    <!-- 别名 -->
+    <typeAliases>
+    <!-- <typeAlias type="org.yuyr757.pojo.User" alias="user"/>-->
+        <package name="org.yuyr757.pojo"/>
+    </typeAliases>
+
+    <!-- default设置默认环境 -->
+    <environments default="test">
+        <!-- 根据不同环境配置相应参数 -->
+        <environment id="development">
+            <!-- 事务管理器，可选的事务管理器有两个：JDBC、MANAGED，MANAGED几乎不用 -->
+            <transactionManager type="JDBC"/>
+            <!-- 数据源配置，POOLED意为使用连接池 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/mybatis?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=true&amp;serverTimezone=UTC"/>
+                <property name="username" value="root"/>
+                <property name="password" value="root"/>
+            </dataSource>
+        </environment>
+
+        <environment id="test">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 每一个mapper.xml都需要在这里注册，不然无法生效 -->
+    <mappers>
+        <!-- <mapper resource="org/yuyr757/Dao/UserMapper.xml"/>-->
+        <!-- <mapper class="org.yuyr757.Dao.UserMapper"/>-->
+        <package name="org.yuyr757.Dao"/>
+    </mappers>
+</configuration>

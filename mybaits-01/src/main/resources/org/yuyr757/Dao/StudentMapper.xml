@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.yuyr757.Dao.StudentMapper">
+
+    <!-- 子查询 -->
+    <select id="getStudent" resultMap="studentTeacher">
+        select * from student
+    </select>
+
+    <resultMap id="studentTeacher" type="student">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <!-- 对象使用association，集合使用collection -->
+        <association property="teacher" column="teacher_id" javaType="teacher" select="getTeacher"/>
+    </resultMap>
+
+    <select id="getTeacher" resultType="teacher">
+        select * from teacher where id = #{id}
+    </select>
+
+    <!-- 连表查询 -->
+    <select id="getStudent2" resultMap="studentTeacher2">
+        select s.id, s.name, s.teacher_id, t.name as teacher_name
+        from student s left join teacher t on s.teacher_id = t.id
+    </select>
+
+    <resultMap id="studentTeacher2" type="student">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <association property="teacher" javaType="teacher">
+            <result property="id" column="teacher_id"/>
+            <result property="name" column="teacher_name"/>
+        </association>
+    </resultMap>
+
+</mapper>
